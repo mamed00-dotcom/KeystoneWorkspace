@@ -145,6 +145,7 @@ keystone/
 - **CMake Customization:** 
   The template is based on the “hello” example. Any additional libraries or include directories required by your application can be added in the `CMakeLists.txt`.
 - **Cmake TEmplate**
+```CMake
 ### Set variables for enclave app and host :
 set(eapp_bin        memom)               # The name of The enclave app
 set(eapp_src        eapp/memom.c)        # Source for The EApp
@@ -227,7 +228,7 @@ add_keystone_package(${eapp_bin}-package
 )
 
 add_dependencies(${eapp_bin}-package ${eapp_bin}-eyrie)
-
+```
 
 ---
 
