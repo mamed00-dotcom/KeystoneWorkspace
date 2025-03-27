@@ -36,79 +36,84 @@ keystone/
 
 2. **Implemented the Enclave (EApp) Code:** 
    In `eapp/memom.c`, a simple C program was written that prints a message:
-   ```c
+```c
    #include <stdio.h>
    int main() {
        printf("Hello from my custom Keystone Enclave (memom)!\n");
        return 0;
    }
-   ```
+```
 
 3. **Implemented the Host Code:** 
    In `host/mhost.cpp`, the host code was modeled after the official "hello" example. It initializes the enclave, sets memory parameters, registers an ocall dispatch function (or uses `nullptr`), and then runs the enclave:
-   ```cpp
-   #include "edge/edge_call.h"
-   #include "host/keystone.h"
-   #include <iostream>
+   
+```cpp
+#include "edge/edge_call.h"
+#include "host/keystone.h"
 
-   using namespace Keystone;
+using namespace Keystone;
 
-   int main(int argc, char** argv) {
-       Enclave enclave;
-       Params params;
+int
+main(int argc, char** argv) {
+  Enclave enclave;
+  Params params;
 
-       params.setFreeMemSize(256 * 1024);
-       params.setUntrustedSize(256 * 1024);
+  params.setFreeMemSize(256 * 1024);
+  params.setUntrustedSize(256 * 1024);
 
-       if (enclave.init(argv[1], argv[2], argv[3], params) != ENCLAVE_OK) {
-           std::cerr << "Failed to initialize enclave!" << std::endl;
-           return 1;
-       }
+  enclave.init(argv[1], argv[2], argv[3], params);
 
-       enclave.registerOcallDispatch(incoming_call_dispatch); // or use nullptr
-       edge_call_init_internals(
-           (uintptr_t)enclave.getSharedBuffer(), enclave.getSharedBufferSize());
+  enclave.registerOcallDispatch(incoming_call_dispatch);
+  edge_call_init_internals(
+      (uintptr_t)enclave.getSharedBuffer(), enclave.getSharedBufferSize());
 
-       enclave.run();
+  enclave.run();
 
-       return 0;
-   }
-   ```
+  return 0;
+}
+```
 
 4. **Configured CMake:** 
    A new `CMakeLists.txt` was added in the `memom` folder. This file sets up the build targets for the enclave, host, runtime, and packaging of the memom example:
-   ```cmake
-   set(eapp_bin memom)
-   set(eapp_src eapp/memom.c)
-   set(host_bin memom-runner)
-   set(host_src host/mhost.cpp)
-   set(package_name "memom.ke")
-   set(package_script "./memom-runner memom eyrie-rt loader.bin")
-   set(eyrie_plugins "io_syscall linux_syscall env_setup")
+```cmake
+set(eapp_bin memom)
+set(eapp_src eapp/memom.c)
+set(host_bin memom-runner)
+set(host_src host/mhost.cpp)
+set(package_name "memom.ke")
+set(package_script "./memom-runner memom eyrie-rt loader.bin")
+set(eyrie_plugins "io_syscall linux_syscall env_setup")
 
-   # Enclave Application (EApp)
-   add_executable(${eapp_bin} ${eapp_src})
-   target_link_libraries(${eapp_bin} "-static")
 
-   # Host Application
-   add_executable(${host_bin} ${host_src})
-   target_link_libraries(${host_bin} ${KEYSTONE_LIB_HOST} ${KEYSTONE_LIB_EDGE})
+# Enclave Application (EApp)
+add_executable(${eapp_bin} ${eapp_src})
+target_link_libraries(${eapp_bin} "-static")
 
-   # Eyrie Runtime
-   set(eyrie_files_to_copy .options_log eyrie-rt loader.bin)
-   add_eyrie_runtime(${eapp_bin}-eyrie
-     ${eyrie_plugins}
-     ${eyrie_files_to_copy})
 
-   # Packaging into a .ke archive
-   add_keystone_package(${eapp_bin}-package
-     ${package_name}
-     ${package_script}
-     ${eyrie_files_to_copy} ${eapp_bin} ${host_bin})
+# Host Application
+add_executable(${host_bin} ${host_src})
+target_link_libraries(${host_bin} ${KEYSTONE_LIB_HOST} ${KEYSTONE_LIB_EDGE})
 
-   add_dependencies(${eapp_bin}-package ${eapp_bin}-eyrie)
-   add_dependencies(examples ${eapp_bin}-package)
-   ```
+
+# Eyrie Runtime
+set(eyrie_files_to_copy .options_log eyrie-rt loader.bin)
+add_eyrie_runtime(${eapp_bin}-eyrie
+  ${eyrie_plugins}
+  ${eyrie_files_to_copy})
+
+
+# Packaging into a .ke archive
+add_keystone_package(${eapp_bin}-package
+  ${package_name}
+  ${package_script}
+  ${eyrie_files_to_copy} ${eapp_bin} ${host_bin})
+
+add_dependencies(${eapp_bin}-package ${eapp_bin}-eyrie)
+
+
+# Register the package target with the top-level "examples" target
+add_dependencies(examples ${eapp_bin}-package)
+```
 
 5. **Registered the Example:** 
    The top-level `CMakeLists.txt` in `~/keystone/examples` was updated to include the new example:
@@ -229,13 +234,5 @@ add_keystone_package(${eapp_bin}-package
 
 add_dependencies(${eapp_bin}-package ${eapp_bin}-eyrie)
 ```
-
----
-
-## Conclusion
-
-This README explains the steps taken to add the memom example to the Keystone repository. It provides details on the directory structure, code files, and build configuration. Feel free to expand on this README with more details or diagrams if needed.
-
----
 
 
