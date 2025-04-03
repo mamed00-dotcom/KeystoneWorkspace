@@ -59,25 +59,87 @@ SECTIONS {
 
 ## Explanation of `CMakeLists.txt`
 
-### Keystone SDK Setup
-- Specifies paths to Keystone SDK and libraries necessary to build enclave (`libkeystone-eapp.a`) and host (`libkeystone-host.a`).
+The `CMakeLists.txt` is carefully structured to handle the complexity of building Keystone enclaves and host applications:
 
-### Enclave (EApp) Configuration
-- Builds enclave executable `beta` from sources:
-  - `beta.c`
-  - `edge_wrapper.c`
-- Links the enclave with Keystone libraries statically.
-- Uses custom linker script (`app.lds`).
+### Setting Keystone Paths and Libraries
 
-### Host Configuration
-- Builds host executable `beta-runner` from sources:
-  - `main.cpp`
-  - `edge_wrapper.cpp`
-- Configures host compilation to use C++11.
+- Defines paths to the Keystone SDK and associated libraries (eapp, edge, host).
 
-### Eyrie Runtime Setup
-- Includes required runtime plugins (`io_syscall`, `linux_syscall`, `env_setup`).
-- Packages enclave and host binaries along with the runtime into a Keystone enclave package (`beta.ke`).
+```cmake
+set(KEYSTONE_SDK_DIR "$ENV{HOME}/keystone/sdk")
+set(KEYSTONE_LIB_EAPP ${KEYSTONE_SDK_DIR}/lib/libkeystone-eapp.a)
+set(KEYSTONE_LIB_EDGE ${KEYSTONE_SDK_DIR}/lib/libkeystone-edge.a)
+set(KEYSTONE_LIB_HOST ${KEYSTONE_SDK_DIR}/lib/libkeystone-host.a)
+```
+
+### Defining Executables
+
+- Specifies enclave (`beta`) and host (`beta-runner`) binaries clearly.
+- Includes `edge_wrapper` files in source definitions to ensure proper compilation.
+
+```cmake
+set(eapp_bin beta)
+set(eapp_src
+    eapp/beta.c
+    eapp/edge_wrapper.c
+)
+
+set(host_bin beta-runner)
+set(host_src
+    host/main.cpp
+    host/edge_wrapper.cpp
+)
+```
+
+### Linker and Compiler Flags
+
+- Ensures enclave binaries are built with the necessary flags (`-nostdlib -static`) for compatibility with Keystone enclaves.
+- Applies a custom linker script (`app.lds`) specifying the entry point (`_start`).
+
+```cmake
+set_target_properties(${eapp_bin}
+  PROPERTIES
+    LINK_FLAGS "-nostdlib -static -T ${CMAKE_CURRENT_SOURCE_DIR}/app.lds"
+)
+```
+
+### Include Directories
+
+- Sets correct include paths to ensure access to Keystone SDK headers during compilation.
+
+```cmake
+target_include_directories(${eapp_bin}
+  PUBLIC ${KEYSTONE_SDK_DIR}/include/app
+  PUBLIC ${KEYSTONE_SDK_DIR}/include/edge
+)
+
+target_include_directories(${host_bin}
+  PUBLIC ${KEYSTONE_SDK_DIR}/include/host
+  PUBLIC ${KEYSTONE_SDK_DIR}/include/edge
+)
+```
+
+### Eyrie Runtime and Packaging
+
+- Integrates Eyrie runtime (`eyrie-rt`) necessary for the enclave environment.
+- Automates packaging into `beta.ke`, bundling enclave and host binaries with runtime.
+
+```cmake
+add_eyrie_runtime(${eapp_bin}-eyrie
+  ${eyrie_plugins}
+  ${eyrie_files_to_copy}
+)
+
+add_keystone_package(${eapp_bin}-package
+  ${package_name}
+  ${package_script}
+  ${eyrie_files_to_copy}
+  ${eapp_bin}
+  ${host_bin}
+)
+
+add_dependencies(${eapp_bin}-package ${eapp_bin}-eyrie)
+```
 
 ## Building the Project
 
