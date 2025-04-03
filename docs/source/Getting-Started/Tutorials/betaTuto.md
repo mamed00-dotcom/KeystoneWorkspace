@@ -81,7 +81,7 @@ SECTIONS {
 
 ## Building the Project
 
-- We should clean first in every project we make to prevent making multiple keystone-examples-* subdirectories inside the the build-generic64/buildroot.build/build path 
+- We should clean first in every project we make to prevent making multiple `keystone-examples-*` subdirectories inside the the build-generic64/buildroot.build/build path 
 
 ```sh
 make BUILDROOT_TARGET=keystone-examples-dirclean
@@ -93,7 +93,10 @@ make BUILDROOT_TARGET=keystone-examples-dirclean
 make -j$(nproc)
 ```
 
-Check the built enclave package:
+- We run the Buildroot image in QEmu:
+```sh
+make run
+```
 
 ## Running the Enclave
 
