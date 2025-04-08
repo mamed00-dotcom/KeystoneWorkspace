@@ -1,5 +1,5 @@
 Custom CI Runner
-===========
+================
 
 We have created a custom CI runner set up with real RISC-V hardware so that we
 can run CI tests even on platforms that don't have a good QEMU-based simulator.

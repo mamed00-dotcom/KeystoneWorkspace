@@ -112,7 +112,7 @@ On 32 bit target, during startup, the linux log display this error
 
 And when you run the enclave application, such as hello-native, you will see the error log as below
 
-.. code-block:: bash
+.. code-block:: console
 
   # /usr/share/keystone/examples/hello-native.ke
   /dev/console

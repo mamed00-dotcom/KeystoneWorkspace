@@ -7,6 +7,8 @@ benchmarks. More will be added over time.
 .. toctree::
    :maxdepth: 1
 
+   betaTuto
+   myNotes
    Build-Enclave-App-Hello-World
    Build-Enclave-App-Hello-World-Native
    Build-Enclave-App-Benchmark
