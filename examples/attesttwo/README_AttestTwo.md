@@ -24,7 +24,7 @@ AttestTwo is a demonstration of how to generate and verify enclave attestation r
 ```
 AttestTwo/
 ├── doc/
-│   └── attest.png //sequence diagram 
+│   └── Attest.png //sequence diagram 
 ├── CMakeLists.txt
 ├── eapp_target/
 │   └── attesttwo_target.c
@@ -35,7 +35,7 @@ AttestTwo/
     
 ## Sequence Diagram
 
-![Attestation Sequence](docs/Attest.png)
+![Attestation Sequence](doc/Attest.png)
 
 
 ## Building inside keystone
