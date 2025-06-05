@@ -1,0 +1,23 @@
+mkdir -p /home/mohamed/keystone//build-generic64/overlay
+[1m [35m>>>  (INF) Configuring Buildroot with riscv64_generic_defconfig(B[m
+make -C /home/mohamed/keystone//buildroot O=/home/mohamed/keystone//build-generic64/buildroot.build BR2_EXTERNAL=/home/mohamed/keystone//overlays/keystone riscv64_generic_defconfig
+make[1]: Entering directory '/home/mohamed/keystone/buildroot'
+  GEN     /home/mohamed/keystone/build-generic64/buildroot.build/Makefile
+#
+# configuration written to /home/mohamed/keystone/build-generic64/buildroot.build/.config
+#
+make[1]: Leaving directory '/home/mohamed/keystone/buildroot'
+echo "BR2_ROOTFS_OVERLAY=\"/home/mohamed/keystone//build-generic64/overlay \"" >> /home/mohamed/keystone//build-generic64/buildroot.build/.config
+echo "BR2_CCACHE_DIR=/home/mohamed/.buildroot-ccache" >> /home/mohamed/keystone//build-generic64/buildroot.build/.config
+[1m [35m>>>  (INF) Building Buildroot(B[m
+set -o pipefail ; make -C /home/mohamed/keystone//buildroot O=/home/mohamed/keystone//build-generic64/buildroot.build BR2_EXTERNAL=/home/mohamed/keystone//overlays/keystone all 2>&1 | \
+            tee /home/mohamed/keystone//build-generic64/build.log | LC_ALL=C grep -of scripts/grep.patterns
+[7m>>> opensbi 1.1 Configuring[27m
+[7m>>> opensbi 1.1 Building[27m
+[7m>>> opensbi 1.1 Installing to staging directory[27m
+[7m>>> opensbi 1.1 Installing to images directory[27m
+[7m>>> opensbi 1.1 Fixing libtool files[27m
+[7m>>> keystone-examples 6274271626c87791 Configuring[27m
+make[2]: *** [package/pkg-generic.mk:283: /home/mohamed/keystone/build-generic64/buildroot.build/build/keystone-examples-6274271626c87791/.stamp_configured] Error 1
+make[1]: *** [Makefile:82: _all] Error 2
+make: *** [Makefile:93: buildroot] Error 2
