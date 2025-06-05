@@ -35,7 +35,7 @@ AttestTwo/
     
 ## Sequence Diagram
 
-![Attestation Sequence](doc/Attest.png)
+![Attestation Sequence](keystone/examples/attesttwo/doc/Attest.png)
 
 
 ## Building inside keystone
